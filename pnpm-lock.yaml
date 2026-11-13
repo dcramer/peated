@@ -469,10 +469,10 @@ importers:
         version: 7.22.0(supports-color@8.1.1)
       '@hono/node-server':
         specifier: ^2.1.6
-        version: 2.1.6(hono@4.13.13)
+        version: 2.1.6(hono@4.13.16)
       '@logtape/hono':
         specifier: 'catalog:'
-        version: 2.2.3(@logtape/logtape@2.2.3)(hono@4.13.13)
+        version: 2.2.3(@logtape/logtape@2.2.3)(hono@4.13.16)
       '@logtape/logtape':
         specifier: 'catalog:'
         version: 2.2.3
@@ -526,7 +526,7 @@ importers:
         version: 11.10.0
       '@sentry/hono':
         specifier: 'catalog:'
-        version: 11.10.0(@sentry/cloudflare@11.10.0(vite@8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)))(@sentry/node@11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)))(hono@4.13.13)
+        version: 11.10.0(@sentry/cloudflare@11.10.0(vite@8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)))(@sentry/node@11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)))(hono@4.13.16)
       '@sentry/node':
         specifier: 'catalog:'
         version: 11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))
@@ -573,8 +573,8 @@ importers:
         specifier: ^10.6.1
         version: 10.6.1(supports-color@8.1.1)
       hono:
-        specifier: ^4.13.13
-        version: 4.13.13
+        specifier: ^4.13.16
+        version: 4.13.16
       ioredis:
         specifier: ^5.11.1
         version: 5.11.1(supports-color@8.1.1)
@@ -6923,8 +6923,8 @@ packages:
   hermes-parser@0.25.1:
     resolution: {integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==}
 
-  hono@4.13.13:
-    resolution: {integrity: sha512-CQ46U0ZkAGmbT/4UxdzzGJpacP2IeKgY4a5/tOI9AABbpOMfK739wfDXmv1usCk+3RkKj1hQy4/fjhiwa2xlrA==}
+  hono@4.13.16:
+    resolution: {integrity: sha512-AOLOEhvrV+iH92xXCnFr/5+3KjPKcI3xP63XJtX5spAnkznPdHijlIsUTpi7/9EhWqrTCekw5c5zh1K+YsVw7A==}
     engines: {node: '>=16.9.0'}
 
   html-encoding-sniffer@4.0.0:
@@ -10482,9 +10482,9 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/node-server@2.1.6(hono@4.13.13)':
+  '@hono/node-server@2.1.6(hono@4.13.16)':
     dependencies:
-      hono: 4.13.13
+      hono: 4.13.16
 
   '@hookform/resolvers@5.9.2(@standard-schema/spec@1.1.0)(ajv@8.20.0)(react-hook-form@7.78.0(react@19.2.7))(superstruct@2.0.2)(valibot@1.5.0(typescript@5.9.3))(zod@4.5.4)':
     dependencies:
@@ -10838,10 +10838,10 @@ snapshots:
 
   '@levischuck/tiny-cbor@0.2.11': {}
 
-  '@logtape/hono@2.2.3(@logtape/logtape@2.2.3)(hono@4.13.13)':
+  '@logtape/hono@2.2.3(@logtape/logtape@2.2.3)(hono@4.13.16)':
     dependencies:
       '@logtape/logtape': 2.2.3
-      hono: 4.13.13
+      hono: 4.13.16
 
   '@logtape/logtape@2.2.3': {}
 
@@ -12526,13 +12526,13 @@ snapshots:
     dependencies:
       '@sentry/core': 11.10.0
 
-  '@sentry/hono@11.10.0(@sentry/cloudflare@11.10.0(vite@8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)))(@sentry/node@11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)))(hono@4.13.13)':
+  '@sentry/hono@11.10.0(@sentry/cloudflare@11.10.0(vite@8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)))(@sentry/node@11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)))(hono@4.13.16)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@sentry/conventions': 0.29.0
       '@sentry/core': 11.10.0
       '@sentry/server-utils': 11.10.0
-      hono: 4.13.13
+      hono: 4.13.16
     optionalDependencies:
       '@sentry/cloudflare': 11.10.0(vite@8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
       '@sentry/node': 11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))
@@ -15187,7 +15187,7 @@ snapshots:
     dependencies:
       hermes-estree: 0.25.1
 
-  hono@4.13.13: {}
+  hono@4.13.16: {}
 
   html-encoding-sniffer@4.0.0:
     dependencies:
