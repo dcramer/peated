@@ -187,6 +187,14 @@ They do not scan auction indexes. A supported saved creation proposal can create
 or safely reuse a Bottle through the shared resolution rules, in the same
 transaction as its lot assignment. Unsupported proposals stay in review.
 
+A recheck does not test classifier changes. A saved check belongs to the lot
+and its source facts, so a lot that already has one gets the same decision
+again, judged by the current automation rules. A new classifier run happens
+only when the lot has no saved check or a detail read changes its facts. A
+closed lot's page rarely changes, so a fresh detail read usually reuses the
+old check too. To measure classifier changes on auctions, read Sentry for the
+lots of the next auction instead.
+
 To read fresh details or retry a failed detail run, select a few unresolved
 Scotch Whisky Auctions lots and add `"refreshSourceDetails": true`. The scheduler
 collects requested details in batches of at most 25 after any active source run.
