@@ -41,6 +41,12 @@ export const KlwinesAuctionsCursorSchema = z
     page: z.number().int().min(1).max(MAX_PAGES),
     // The next list record to read on this page.
     recordIndex: z.number().int().min(0).max(PAGE_SIZE),
+    // The first SKU on the page before this one, to catch a list that did
+    // not move to the next page.
+    previousFirstSku: z
+      .string()
+      .regex(/^\d{1,12}$/)
+      .optional(),
   })
   .strict();
 export const KlwinesAuctionsObservationSchema = z
@@ -120,8 +126,9 @@ function query(html: string, key: string) {
 export function klwinesAuctionListUrl(page: number) {
   const url = new URL(LIST_PATH, ORIGIN);
   url.searchParams.set("filters", LIST_FILTER);
-  // TODO(auctions): confirm K&L's page parameter from a page-2 list URL
-  // before the first run; the pager is script-only and shows no link.
+  // TODO(auctions): confirm K&L's page parameter from a page-2 list URL; the
+  // pager is script-only and shows no link. If K&L ignores it, the adapter's
+  // page check stops the run on page 2.
   if (page > 1) url.searchParams.set("page", String(page));
   return url;
 }
@@ -337,6 +344,14 @@ export const klwinesAuctionsAdapter: ScraperAdapter<
       url: klwinesAuctionListUrl(state.page),
     });
     const { records, total } = parseKlwinesAuctionList(response.body);
+    // Scraper request rule (owner: auctions): a page that starts with the
+    // previous page's first lot means K&L ignored the page parameter. Stop
+    // instead of re-reading the same lot pages for every later page.
+    if (
+      state.previousFirstSku !== undefined &&
+      records[0]?.sku === state.previousFirstSku
+    )
+      throw new Error("K&L list pagination did not advance.");
     for (let index = state.recordIndex; index < records.length; index++) {
       const record = records[index];
       if (isKlwinesWhiskyLot(record)) {
@@ -371,7 +386,11 @@ export const klwinesAuctionsAdapter: ScraperAdapter<
       state.page >= MAX_PAGES
     )
       return;
-    state = { page: state.page + 1, recordIndex: 0 };
+    state = {
+      page: state.page + 1,
+      recordIndex: 0,
+      previousFirstSku: records[0].sku,
+    };
     await session.checkpoint(state);
   }
 };

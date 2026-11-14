@@ -314,5 +314,30 @@ test("resumes mid-page and stops at the last listed page", async () => {
   expect(checkpoint.mock.calls.at(-1)?.[0]).toEqual({
     page: 2,
     recordIndex: 1,
+    previousFirstSku: "1",
+  });
+});
+
+test("stops when the next list page repeats the previous one", async () => {
+  const emit = vi.fn<Session["emit"]>();
+  const checkpoint = vi.fn<Session["checkpoint"]>();
+  const records = Array.from({ length: 48 }, (_, index) =>
+    record({ sku: String(index + 1), varietal: "Rum" }),
+  );
+  // The list ignores the page parameter and returns page 1 again.
+  const request = vi.fn<Session["request"]>(async ({ url }) =>
+    response(url, listPage(records, 1000)),
+  );
+  await expect(
+    klwinesAuctionsAdapter({
+      cursor: null,
+      session: { request, emit, checkpoint, remainingRequests: () => 100 },
+    }),
+  ).rejects.toThrow("pagination did not advance");
+  expect(request).toHaveBeenCalledTimes(2);
+  expect(checkpoint.mock.calls.at(-1)?.[0]).toEqual({
+    page: 2,
+    recordIndex: 0,
+    previousFirstSku: "1",
   });
 });
