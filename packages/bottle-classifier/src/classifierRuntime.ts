@@ -1109,6 +1109,7 @@ export function createBottleClassifier(
   const runBottleClassifierAgentWithBudget = async ({
     reference,
     extractedIdentity,
+    extractedIdentitySource,
     imageEvidence,
     initialCandidates = [],
     candidateExpansion = "open",
@@ -1130,6 +1131,7 @@ export function createBottleClassifier(
         reference,
         conversationId: resolvedConversationId,
         extractedIdentity,
+        extractedIdentitySource,
         imageEvidence,
         initialCandidates,
         candidateExpansion,
@@ -1164,6 +1166,9 @@ export function createBottleClassifier(
       conversationId: resolvedConversationId,
       initialCandidates,
       extractedIdentity,
+      // The agent weighs extracted facts by where they came from, such as a
+      // retailer's stock photo, so the source must reach its input.
+      extractedIdentitySource,
       imageEvidence,
       candidateExpansion,
       readCandidateImages,

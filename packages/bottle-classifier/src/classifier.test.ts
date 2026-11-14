@@ -2719,6 +2719,50 @@ describe("createBottleClassifier", () => {
     expect(result.artifacts.extractedIdentitySource).toBe("image");
   });
 
+  test.each([
+    {
+      label: "a source photo",
+      input: {
+        reference: {
+          name: "Wild Turkey Rare Breed Rye",
+          imageUrl: "https://example.com/wild-turkey.png",
+        },
+      },
+      expected: "image",
+    },
+    {
+      label: "supplied source data",
+      input: {
+        reference: { name: "Wild Turkey Rare Breed Rye" },
+        extractedIdentity: wildTurkeyRareBreedRyeIdentity,
+        extractedIdentitySource: "structured" as const,
+      },
+      expected: "structured",
+    },
+  ])(
+    "tells the agent its extracted facts came from $label",
+    async ({ input, expected }) => {
+      const runAgent = vi.fn(async (_run: PreparedBottleClassifierAgentRun) =>
+        nativeAgentResult({
+          finalOutput: noMatchAgentDecision(),
+          inputTokens: 1,
+          outputTokens: 1,
+        }),
+      );
+      const { classifier } = createTestClassifier({
+        maxSearchQueries: 0,
+        extractedIdentityFromImage: wildTurkeyRareBreedRyeIdentity,
+        runPreparedBottleClassifierAgent: runAgent,
+      });
+
+      await classifier.runBottleReference(input);
+
+      expect(runAgent).toHaveBeenCalledOnce();
+      const agentInput = JSON.parse(runAgent.mock.calls[0][0].input);
+      expect(agentInput.extractedIdentitySource).toBe(expected);
+    },
+  );
+
   test("keeps supplied extraction provenance unknown when omitted", async () => {
     const { classifier } = createTestClassifier({
       runBottleClassifierAgent: async ({ extractedIdentity }) => ({
