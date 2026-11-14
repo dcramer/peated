@@ -259,7 +259,13 @@ Post-agent checks validate a decision; they are not a second classifier. They
 may reject an unknown target, impossible state, non-whisky result, or direct
 conflict. They must not replace a semantic match merely because local text or
 search rank cannot prove it. Missing support may route the result to review
-through `deriveAutomationTier`.
+through `deriveAutomationTier`. The agent's instructions name the same
+anchors, so the agent knows what a match needs to apply without a person. When
+only local catalog text supports a match, the agent searches the web for the
+exact release first: a page that confirms it makes web evidence `supportive`,
+and one that shows a better sibling changes the action. `not_needed` means
+something outside the local catalog already settles the action, such as an
+exact accepted reference, a matching cask code, or the product's own label.
 
 The contract has no numeric confidence score. The model records typed
 `unresolvedRisks`, its evidence judgment, and its action. Any unresolved risk

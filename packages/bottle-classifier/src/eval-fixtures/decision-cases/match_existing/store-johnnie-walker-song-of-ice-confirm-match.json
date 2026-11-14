@@ -1,0 +1,727 @@
+{
+  "id": "store-johnnie-walker-song-of-ice-confirm-match",
+  "name": "store listing: Johnnie Walker A Song of Ice matches its Bottle automatically once the web confirms the release",
+  "input": {
+    "reference": {
+      "id": 12063391,
+      "url": "https://www.reservebar.com/products/johnnie-walker-a-song-of-ice-blended-scotch-whisky/GROUPING-1279436",
+      "name": "Johnnie Walker A Song Of Ice Blended Scotch Whisky",
+      "imageUrl": null,
+      "externalSiteId": 8,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Johnnie Walker",
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": "blend",
+      "distillery": [],
+      "expression": "A Song of Ice",
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "extractedIdentitySource": "text",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 117.10579,
+        "series": null,
+        "source": [
+          "vector",
+          "text",
+          "brand",
+          "brand_coverage",
+          "exact",
+          "context"
+        ],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13511,
+        "category": "blend",
+        "fullName": "Johnnie Walker A Song of Ice",
+        "reference": "Johnnie Walker A Song of Ice",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 87.175354,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13510,
+        "category": "blend",
+        "fullName": "Johnnie Walker A Song of Fire",
+        "reference": "Johnnie Walker A Song of Fire, 40.8%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Johnnie Walker",
+        "score": 77.70813,
+        "series": "Cobalt Series",
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": "Ice Chalet",
+        "outturn": null,
+        "bottleId": 57893,
+        "category": "blend",
+        "fullName": "Johnnie Walker Blue Label - Ice Chalet",
+        "reference": "Johnnie Walker Blue Label Ice Chalet, 43%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": ["Brora", "Dalwhinnie", "Clynelish"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 54.266487,
+        "series": null,
+        "source": ["text"],
+        "bottler": "John Walker & Sons",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2867,
+        "category": "blend",
+        "fullName": "Johnnie Walker White Walker Limited Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Johnnie Walker",
+        "score": 53.952385,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56634,
+        "category": "blend",
+        "fullName": "Johnnie Walker Blue Label",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 53.72083,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14011,
+        "category": "blend",
+        "fullName": "Johnnie Walker Gold Label Reserve",
+        "reference": "Johnnie Walker Gold Reserve",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 53.67388,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18286,
+        "category": "blend",
+        "fullName": "Johnnie Walker Blue Anniversary",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 53.67388,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13901,
+        "category": "blend",
+        "fullName": "Johnnie Walker Sweet Peat",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Johnnie Walker",
+        "score": 52.957863,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47460,
+        "category": "blend",
+        "fullName": "Johnnie Walker Blonde",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Johnnie Walker",
+        "score": 52.869213,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Johnnie Walker",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45650,
+        "category": "blend",
+        "fullName": "Johnnie Walker Black Ruby - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 52.48501,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11893,
+        "category": "blend",
+        "fullName": "Johnnie Walker High Rye",
+        "reference": "Johnnie Walker High Rye Blended Scotch Whisky",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 51.84005,
+        "series": null,
+        "source": ["text"],
+        "bottler": "John Walker & Sons",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 6127,
+        "category": "blend",
+        "fullName": "Johnnie Walker Black Label Islay Origin",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 51.762592,
+        "series": null,
+        "source": ["text"],
+        "bottler": "John Walker & Sons",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 9828,
+        "category": "blend",
+        "fullName": "Johnnie Walker Island Green Blended Malt Scotch Whisky",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Johnnie Walker",
+        "score": 51.684185,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16684,
+        "category": "blend",
+        "fullName": "Johnnie Walker Odyssey",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Johnnie Walker",
+        "score": 51.684185,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56999,
+        "category": "blend",
+        "fullName": "Johnnie Walker Premier",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [13511],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "A Song of Ice",
+          "brand": {
+            "name": "Johnnie Walker",
+            "entityId": 1093
+          },
+          "series": null,
+          "bottler": null,
+          "category": "blend",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 13353,
+        "bottleId": 13511,
+        "fullName": "Johnnie Walker A Song of Ice",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Johnnie Walker A Song of Ice",
+            "ignored": false
+          },
+          {
+            "name": "Johnnie Walker A Song of Ice, 40.2%",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "A Song of Ice",
+                "brand": {
+                  "id": null,
+                  "name": "Johnnie Walker"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": null,
+                "outturn": null,
+                "category": "blend",
+                "statedAge": null,
+                "caskNumber": null,
+                "distillers": [],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Game Of Thrones Johnnie Walker A Song Of Ice Scotch Whisky",
+            "sourceKey": "store_price:2920",
+            "sourceUrl": "https://woodencork.com/collections/whiskey/products/game-of-thrones-johnnie-walker-a-song-of-ice-scotch-whisky",
+            "sourceName": "Game Of Thrones Johnnie Walker A Song Of Ice Scotch Whisky",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Johnnie Walker",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1093,
+        "reference": "Johnnie Walker",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Johnnie Walker"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Brora",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 116,
+        "reference": "Brora",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Brora"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Dalwhinnie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 515,
+        "reference": "Dalwhinnie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Dalwhinnie"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Clynelish",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 843,
+        "reference": "Clynelish",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Clynelish"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "John Walker & Sons",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1091,
+        "reference": "John Walker & Sons",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "John Walker & Sons"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://whiskyadvocate.com/Johnnie-Walker-A-Song-of-Ice-40-2",
+      "https://www.thewhiskyexchange.com/p/55287/johnnie-walker-a-song-of-ice-game-of-thrones-whisky"
+    ],
+    "dbOutcome": {
+      "bottleId": 13511,
+      "createsBottle": false,
+      "summary": "Production returned match 13511 with web evidence not_used and held it for review: no anchor confirmed the match."
+    },
+    "notes": "Captured from saved classifier run 37500 (store_price 12063391, model openai/gpt-6-luna, 2026-11-13T22:00:24.549Z). Production rationale: The source identifies the Johnnie Walker blended Scotch whisky A Song of Ice. Inspected Bottle 13511 has the same Brand and expression, and its accepted references include the matching product name. No populated identity fields conflict. The ReserveBar listing is retailer-specific, so it is not a global alias. Verified 2026-11-14 against the sources listed."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 13511,
+    "expectedTier": "auto",
+    "summary": "Match Johnnie Walker A Song of Ice (13511) automatically. The ReserveBar title names the release; the Bottle's accepted references include it. With no exact reference to the source name, the match rests on local catalog text, so the agent confirms the release on the web: the Game of Thrones limited-edition blend at 40.2%, built around Clynelish."
+  }
+}
