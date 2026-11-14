@@ -134,6 +134,11 @@ whisky lot page, up to about 1,500, so a full run takes six hours or more.
 Both K&L hosts sit behind Cloudflare and DataDome; expect the website to be
 marked blocked and its requests to go through Firecrawl.
 
+The list's page parameter has not been confirmed against K&L's site. If K&L
+ignores it, the run stops on page 2 with "K&L list pagination did not
+advance." instead of re-reading the same lots. Confirm the page-2 URL in a
+browser and fix `klwinesAuctionListUrl` before the next run.
+
 Closed lots stay on K&L's list for about two weeks, so run once after each
 batch closes to save its results, and once early in a batch to start
 matching. Check the first run's request count, blocked status, and a sample of
