@@ -849,7 +849,11 @@
     "https://www.abc.virginia.gov/products/bourbon/stagg-single-barrel-select",
     "https://caskcartel.com/products/stagg-sazerac-barrel-select-straight-bourbon-whiskey",
     "https://shop.klwines.com/auctions/bidding/2083932",
-    "https://shop.klwines.com/auctions/bidding/2083899"
+    "https://shop.klwines.com/auctions/bidding/2083899",
+    "https://whiskyadvocate.com/Johnnie-Walker-A-Song-of-Ice-40-2",
+    "https://www.thewhiskyexchange.com/p/55287/johnnie-walker-a-song-of-ice-game-of-thrones-whisky",
+    "https://www.suntoryglobalspirits.com/news/makers-markr-introduces-its-first-ever-nationally-available-limited-release-bourbon",
+    "https://www.drinkhacker.com/2020/01/27/review-makers-mark-rc6/"
   ],
   "cases": {
     "1792-single-barrel": {
@@ -15137,6 +15141,91 @@
         }
       ],
       "imageResults": []
+    },
+    "store-johnnie-walker-song-of-ice-confirm-match": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Johnnie Walker A Song of Ice blended Scotch whisky",
+            "summary": "Product pages and a review identify Johnnie Walker A Song of Ice, the limited-edition Game of Thrones blended Scotch, 70cl, 40.2% ABV, with Clynelish as its key malt. It was released alongside A Song of Fire.",
+            "results": [
+              {
+                "title": "Johnnie Walker A Song of Ice 40.2%",
+                "url": "https://whiskyadvocate.com/Johnnie-Walker-A-Song-of-Ice-40-2",
+                "domain": "whiskyadvocate.com",
+                "description": "Whisky Advocate review of Johnnie Walker A Song of Ice, the House Stark limited edition blended Scotch, 40.2% ABV.",
+                "extraSnippets": []
+              },
+              {
+                "title": "Johnnie Walker A Song of Ice / Game of Thrones Whisky",
+                "url": "https://www.thewhiskyexchange.com/p/55287/johnnie-walker-a-song-of-ice-game-of-thrones-whisky",
+                "domain": "thewhiskyexchange.com",
+                "description": "Limited-edition Johnnie Walker blend for Game of Thrones, led by Clynelish single malt. 70cl, 40.2%.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": []
+    },
+    "store-makers-mark-rc6-2019-confirm-match": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Maker's Mark RC6 2019 Wood Finishing Series",
+            "summary": "Maker's Mark's 2019 Wood Finishing Series limited release, Stave Profile RC6, was finished with ten RC6 staves and bottled at cask strength, 108.2 proof (about 54%), 750ml. It was the brand's first nationally available limited release.",
+            "results": [
+              {
+                "title": "Maker's Mark Introduces Its First-Ever Nationally Available Limited Release Bourbon",
+                "url": "https://www.suntoryglobalspirits.com/news/makers-markr-introduces-its-first-ever-nationally-available-limited-release-bourbon",
+                "domain": "suntoryglobalspirits.com",
+                "description": "Maker's Mark Wood Finishing Series 2019 Limited Release, Stave Profile RC6, bottled at 108.2 proof.",
+                "extraSnippets": []
+              },
+              {
+                "title": "Review: Maker's Mark RC6 2019 Limited Release",
+                "url": "https://www.drinkhacker.com/2020/01/27/review-makers-mark-rc6/",
+                "domain": "drinkhacker.com",
+                "description": "Maker's Mark RC6, the 2019 Wood Finishing Series release: 108.2 proof, 53.9% ABV, 750ml.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": [
+        {
+          "url": "https://api.peated.com/uploads/prices-ovdzac7j1d6s6xofli39jtqz.webp",
+          "result": {
+            "abv": 54.1,
+            "brand": "Maker's Mark",
+            "series": "Wood Finishing Series",
+            "bottler": null,
+            "edition": "RC6",
+            "outturn": null,
+            "category": "bourbon",
+            "distillery": ["Maker's Mark"],
+            "expression": null,
+            "maturation": "Barrel finished with 10 virgin toasted American oak staves",
+            "stated_age": null,
+            "cask_number": null,
+            "release_day": null,
+            "single_cask": null,
+            "release_year": 2019,
+            "vintage_year": null,
+            "bottling_year": null,
+            "cask_strength": null,
+            "release_month": null
+          }
+        }
+      ]
     }
   }
 }

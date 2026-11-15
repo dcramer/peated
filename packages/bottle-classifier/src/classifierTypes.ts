@@ -567,7 +567,7 @@ export const BottleConfidenceBasisSchema = z
       .enum(["not_needed", "not_used", "supportive", "weak", "conflicting"])
       .default("not_used")
       .describe(
-        "How web evidence affected confidence. Use supportive only when web evidence supports a match or create action, not for no_match.",
+        "How web evidence affected the action. `supportive`: a page about this exact release confirms its telling facts and supports the match or create; never for no_match. `weak`: results were too general or incomplete to confirm the exact release. `conflicting`: results contradict the source or the chosen Bottle. `not_needed`: something outside the local catalog already settles the action without the web, such as an accepted reference equal to the source name, a matching cask or bottle code, or the product's own label; local catalog text alone is not this. `not_used`: the web was not searched or was unavailable.",
       ),
   })
   .strict();
