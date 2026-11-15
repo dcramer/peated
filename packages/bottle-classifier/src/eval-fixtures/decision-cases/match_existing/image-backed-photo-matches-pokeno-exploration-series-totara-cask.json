@@ -22,6 +22,65 @@
       "single_cask": null,
       "edition": null
     },
+    "imageEvidence": {
+      "sourceImageId": "tcpwlgq69tkvom09zlx0e1gy",
+      "extractors": [
+        {
+          "kind": "vision",
+          "model": "openai/gpt-6-luna",
+          "confidence": 0.75,
+          "textSpans": [
+            {
+              "text": "Pōkeno Exploration Series No. 1 Totara Cask Exploration Series Pōkeno 40% ABV",
+              "confidence": 0.75
+            }
+          ],
+          "observations": [
+            "Read whisky label identity from the uploaded bottle photo."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Pōkeno",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "Exploration Series No. 1 Totara Cask",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "series": {
+          "value": "Exploration Series",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "distillery": {
+          "value": ["Pōkeno"],
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "single_malt",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 40,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true,
+        "reason": null
+      },
+      "conflicts": []
+    },
     "initialCandidates": [
       {
         "reference": null,
@@ -105,7 +164,7 @@
       "createsBottle": false,
       "summary": "Assign the photo tasting to existing Peated Bottle 44263, Pōkeno Exploration Series No. 1 Totara Cask. Do not create another Bottle for this photo."
     },
-    "notes": "Added from a failed /addTasting photo-identification attempt using the preserved uploaded image. The label visibly shows Pōkeno Aotearoa New Zealand Single Malt Whisky, Exploration Series No. 01, Totara Cask, 700ml, 40% ABV. The official Pokeno product page and blog verify Totara Cask as part of the Exploration Series."
+    "notes": "Added from a failed /addTasting photo-identification attempt using the preserved uploaded image. The label visibly shows Pōkeno Aotearoa New Zealand Single Malt Whisky, Exploration Series No. 01, Totara Cask, 700ml, 40% ABV. The official Pokeno product page and blog verify Totara Cask as part of the Exploration Series. `input.imageEvidence` is rebuilt with `buildPhotoEvidenceFromExtractedIdentity` from the saved `extractedIdentity`, because photo identification always sends it; the original capture predates that field."
   },
   "expected": {
     "status": "classified",
