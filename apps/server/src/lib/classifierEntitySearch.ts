@@ -89,6 +89,59 @@ function containedNameCandidates(normalizedQuery: string): string[] {
   return [...candidates];
 }
 
+/**
+ * Entity lookup rule (owner: Entity search): a name names an Entity when it
+ * equals the Entity's name or short name, or an accepted Entity reference,
+ * ignoring case, spacing, and punctuation. Classifier Entity search and Bottle
+ * candidate search both use this rule.
+ */
+function exactEntityNameWhere(query: string) {
+  const normalizedQuery = normalizeEntityLookupText(query);
+  const lowerQuery = query.toLowerCase();
+  return or(
+    eq(sql`LOWER(${entities.name})`, lowerQuery),
+    eq(sql`LOWER(${entities.shortName})`, lowerQuery),
+    normalizedQuery ? eq(entities.normalizedName, normalizedQuery) : undefined,
+    normalizedQuery
+      ? eq(entities.normalizedShortName, normalizedQuery)
+      : undefined,
+  );
+}
+
+function exactEntityReferenceWhere(query: string) {
+  const normalizedQuery = normalizeEntityLookupText(query);
+  return or(
+    eq(sql`LOWER(${entityReferences.name})`, query.toLowerCase()),
+    normalizedQuery
+      ? eq(entityReferences.normalizedName, normalizedQuery)
+      : undefined,
+  );
+}
+
+/** Ids of the Entities each name names exactly; see exactEntityNameWhere. */
+export async function findEntityIdsByExactName(
+  names: readonly string[],
+): Promise<number[]> {
+  const ids = new Set<number>();
+  for (const name of new Set(names.map((value) => value.trim()))) {
+    if (!name) continue;
+    const [entityRows, referenceRows] = await Promise.all([
+      db
+        .select({ id: entities.id })
+        .from(entities)
+        .where(exactEntityNameWhere(name)),
+      db
+        .select({ id: entityReferences.entityId })
+        .from(entityReferences)
+        .where(exactEntityReferenceWhere(name)),
+    ]);
+    for (const row of [...entityRows, ...referenceRows]) {
+      if (row.id !== null) ids.add(row.id);
+    }
+  }
+  return [...ids];
+}
+
 // Entity lookups query entities and their references separately so each
 // comparison can use its index; an OR across the join forces a full scan.
 export async function searchClassifierEntities(
@@ -121,37 +174,13 @@ export async function searchClassifierEntities(
   const exactEntityMatches = await db
     .select(entityColumns)
     .from(entities)
-    .where(
-      and(
-        kindFilter,
-        or(
-          eq(sql`LOWER(${entities.name})`, lowerQuery),
-          eq(sql`LOWER(${entities.shortName})`, lowerQuery),
-          normalizedQuery
-            ? eq(entities.normalizedName, normalizedQuery)
-            : undefined,
-          normalizedQuery
-            ? eq(entities.normalizedShortName, normalizedQuery)
-            : undefined,
-        ),
-      ),
-    )
+    .where(and(kindFilter, exactEntityNameWhere(args.query)))
     .limit(args.limit);
   const exactReferenceMatches = await db
     .select(referenceColumns)
     .from(entityReferences)
     .innerJoin(entities, eq(entities.id, entityReferences.entityId))
-    .where(
-      and(
-        kindFilter,
-        or(
-          eq(sql`LOWER(${entityReferences.name})`, lowerQuery),
-          normalizedQuery
-            ? eq(entityReferences.normalizedName, normalizedQuery)
-            : undefined,
-        ),
-      ),
-    )
+    .where(and(kindFilter, exactEntityReferenceWhere(args.query)))
     .limit(args.limit);
   // Text matches rank below exact, prefix, and contained matches.
   const textMatches = await db

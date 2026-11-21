@@ -539,3 +539,66 @@ test("finds the plain expression beside its cask-finish edition", async ({
 
   expect(candidates.map(({ bottleId }) => bottleId)).toContain(plain.id);
 });
+
+// A label photo read as Whyte & Whyte, Rosebank, 18 years, 1974 once listed
+// an Ardbeg and four unrelated 18-year-olds as its possible matches.
+test("lists Bottles from the label's distillery before other producers with the same age", async ({
+  fixtures,
+}) => {
+  config.AI_GATEWAY_API_KEY = undefined;
+  const rosebank = await fixtures.Entity({
+    name: "Rosebank",
+    kind: "distillery",
+  });
+  const rosebankRelease = await fixtures.Bottle({
+    name: "21-year-old",
+    brandId: rosebank.id,
+    distillerIds: [rosebank.id],
+    category: "single_malt",
+    statedAge: 21,
+    vintageYear: 1991,
+  });
+  const ardbeg = await fixtures.Entity({ name: "Ardbeg", kind: "distillery" });
+  const cadenhead = await fixtures.Entity({ name: "Cadenhead's" });
+  const otherDistillery = await fixtures.Bottle({
+    name: "Ardbeg 1974 18-year-old",
+    brandId: cadenhead.id,
+    distillerIds: [ardbeg.id],
+    category: "single_malt",
+    statedAge: 18,
+    vintageYear: 1974,
+  });
+  const unrelated = [];
+  for (const name of ["Deerstalker", "Lismore", "Shieldaig"]) {
+    const brand = await fixtures.Entity({ name });
+    unrelated.push(
+      await fixtures.Bottle({
+        name: "18-year-old",
+        brandId: brand.id,
+        statedAge: 18,
+      }),
+    );
+  }
+
+  const candidates = await findBottleReferenceCandidates(
+    { name: "Whyte & Whyte 18 year old 1974" },
+    sourceLabel({
+      brand: "Whyte & Whyte",
+      bottler: "Whyte & Whyte (Scotland) Ltd.",
+      distillery: ["Rosebank"],
+      category: "single_malt",
+      stated_age: 18,
+      vintage_year: 1974,
+    }),
+  );
+  const ids = candidates.map(({ bottleId }) => bottleId);
+
+  expect(candidates[0]).toMatchObject({
+    bottleId: rosebankRelease.id,
+    source: expect.arrayContaining(["producer"]),
+  });
+  expect(ids.at(-1)).toBe(otherDistillery.id);
+  expect(ids).toEqual(
+    expect.arrayContaining(unrelated.map((bottle) => bottle.id)),
+  );
+});

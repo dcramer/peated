@@ -5,30 +5,52 @@ or prove that two releases are identical.
 
 ## Retrieval
 
-Creation candidates use independent windows of 50 text matches and 50 candidates
-from known Brand or distillery IDs. An accepted exact reference can add its directly
-assigned Bottle before indexing catches up. Ignored references and retired Bottles
-are excluded. Candidate queries read identity fields; only final results receive
-full Bottle serialization. Responses retain the existing Bottle fields and add
-agreements, missing facts, and conflicts.
+Two searches ask "which existing Bottle is this?": the "Possible duplicates"
+check on Bottle creation (`apps/server/src/orpc/routes/bottles/create-candidates.ts`)
+and the classifier's Bottle candidates for photos, prices, auctions, and reviews
+(`apps/server/src/lib/bottleReferenceCandidates.ts`). They share these rules:
 
-The limit keeps every Bottle found through the known Brand and expression words,
-even with a conflicting fact. Otherwise a wrong stored fact on the real Bottle ranks
-it below unrelated Brands, and the classifier creates a duplicate it never saw.
+- **Producer window.** Each reserves a window for Bottles of the known Brand,
+  bottler, or distillery (`bottleProducerCandidates.ts`), so popular unrelated
+  Bottles cannot fill the text limit and hide a rare release. Creation sends
+  Entity IDs. The classifier has names from the source, and looks them up with
+  the exact Entity name rule (name, short name, or accepted Entity reference)
+  that classifier Entity search uses.
+- **Comparison.** Typed release fields use the one comparison the classifier
+  and automatic matching use (see "Deterministic Code" in
+  [Bottle Classifier](./bottle-classifier.md)). Brand, bottler, Series, and
+  distilleries compare by stored ID, or by name when an ID is missing. Missing
+  facts are not contradictions.
+- **Order.** `orderBottleCandidateComparisons` orders both lists:
+  1. A Bottle from another distillery sorts last.
+  2. A Bottle that shares the distillery, Brand, or bottler leads one that
+     shares none. A Brand conflict alone only loses this step, because members
+     and labels often name the bottler or owner as the Brand.
+  3. Fewer release conflicts, then more release agreements.
+  4. Text relevance.
 
-The shared comparator orders release evidence before name similarity. Stored
-relationship IDs take precedence over names. Typed fields use the one
-comparison the classifier and automatic matching use (see "Deterministic Code" in
-[Bottle Classifier](./bottle-classifier.md)). Missing facts are not
-contradictions. Creation
-candidates leave out a Bottle that shares none of the entered distilleries; a
-Bottle with no stored distillery stays. Maturation
-wording and outturn do not determine identity. Bottling year remains contextual
-evidence, not an independent reason to create another Bottle.
+Conflicting Bottles stay in the classifier's list, so a wrong fact on the
+source or the stored Bottle cannot hide the real Bottle and cause a duplicate.
+Creation, where a member chose the distilleries, leaves out a Bottle that shares
+none of them; a Bottle with no stored distillery stays.
 
-The classifier uses the same comparison and retains its exact-reference, vector,
-and producer discovery paths. TIN provides text retrieval. Existing
-classification validation and automation gates still control assignment.
+Each search keeps its other inputs:
+
+- Creation: text matches on the entered name and an accepted exact reference.
+- Classifier: text matches on the source text, embedding matches, an accepted
+  exact reference, and Brand-name and Brand word-coverage matches. The limit
+  keeps every Bottle found through the known Brand and expression words, even
+  with a conflicting fact. Otherwise a wrong stored fact on the real Bottle
+  ranks it below unrelated Brands, and the classifier creates a duplicate it
+  never saw.
+
+Ignored references and retired Bottles are excluded. Maturation wording and
+outturn do not determine identity. Bottling year remains contextual evidence,
+not an independent reason to create another Bottle. Candidate queries read
+identity fields; only final results receive full Bottle serialization.
+Responses retain the existing Bottle fields and add agreements, missing facts,
+and conflicts. Existing classification validation and automation gates still
+control assignment.
 
 Catalog listing retains filters, counts, pagination, explicit sort choices, and
 exact-reference priority. The Bottle section of global search shares these documents,
@@ -97,7 +119,9 @@ support the engine choice; endpoint measurements still detect application overhe
 
 API tests cover TIN retrieval, references before indexing, wrong relationships,
 rare releases, prefixes, accents, typos, pagination, and indexing. Comparator tests
-cover nearby casks, years, strengths, and unknown facts. Recorded-request tests
+cover nearby casks, years, strengths, unknown facts, and producer-before-release
+order. Classifier model checks read a local catalog with its own simple search,
+so they do not test this retrieval; the API tests above do. Recorded-request tests
 retain five moderation searches with their reviewed outcomes and public catalog
 snapshots. They cover existing candidates, ambiguous results, and retrieval
 before and after a missing Bottle is created, using the original query inputs.
