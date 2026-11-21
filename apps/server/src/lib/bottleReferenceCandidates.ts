@@ -28,6 +28,12 @@ import {
   normalizePotentialProofLikeAbvFields,
   normalizePotentialProofToAbv,
 } from "@peated/server/lib/abv";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
+import {
+  bottleProducerOrder,
+  bottleProducerWhere,
+} from "@peated/server/lib/bottleProducerCandidates";
+import { findEntityIdsByExactName } from "@peated/server/lib/classifierEntitySearch";
 import { logError } from "@peated/server/lib/log";
 import {
   isAIGatewayConfigured,
@@ -51,6 +57,7 @@ const VECTOR_CANDIDATE_LIMIT = 20;
 const TEXT_CANDIDATE_LIMIT = 50;
 const BRAND_CANDIDATE_LIMIT = 5;
 const BRAND_COVERAGE_CANDIDATE_LIMIT = 10;
+const PRODUCER_CANDIDATE_LIMIT = 20;
 
 type BottleReferenceIdentity = BottleExtractedDetails;
 export type BottleCandidateQueryRow = {
@@ -1063,6 +1070,67 @@ async function getBrandCoverageCandidates(
   return rows.map((row) => buildBottleCandidate(row, "brand_coverage"));
 }
 
+/**
+ * Finds Bottles of the Brand, bottler, and distilleries the source names,
+ * with the same producer window as Bottle creation (bottle-search.md,
+ * "Retrieval"). A Bottle with a rare name still reaches the comparison when
+ * the source names its distillery, even if text search misses it.
+ */
+async function getProducerCandidates(
+  extractedLabel: BottleReferenceIdentity | null,
+  runQuery: BottleCandidateQueryRunner,
+): Promise<BottleCandidate[]> {
+  if (!extractedLabel) {
+    return [];
+  }
+  const [brandIds, bottlerIds, distillerIds] = await Promise.all([
+    findEntityIdsByExactName(
+      extractedLabel.brand ? [extractedLabel.brand] : [],
+    ),
+    findEntityIdsByExactName(
+      extractedLabel.bottler ? [extractedLabel.bottler] : [],
+    ),
+    findEntityIdsByExactName(extractedLabel.distillery ?? []),
+  ]);
+  const producer = bottleProducerWhere({ brandIds, bottlerIds, distillerIds });
+  if (!producer) {
+    return [];
+  }
+  const order = bottleProducerOrder({
+    caskNumber: extractedLabel.cask_number,
+    statedAge: extractedLabel.stated_age,
+    vintageYear: extractedLabel.vintage_year,
+    abv: extractedLabel.abv,
+  });
+
+  const rows = await runQuery(sql`
+    SELECT
+      ${bottles.id} AS "bottleId",
+      ${bottles.fullName} AS "fullName",
+      ${entities.name} AS brand,
+      ${bottles.category} AS category,
+      ${bottles.statedAge} AS "statedAge",
+      ${bottles.edition} AS edition,
+      ${bottles.caskStrength} AS "caskStrength",
+      ${bottles.singleCask} AS "singleCask",
+      ${bottles.abv} AS abv,
+      ${bottles.vintageYear} AS "vintageYear",
+      ${bottles.bottlingYear} AS "bottlingYear",
+      ${bottles.releaseYear} AS "releaseYear",
+      ${bottles.maturation} AS "maturation",
+      ${bottles.caskNumber} AS "caskNumber",
+      ${bottles.outturn} AS "outturn"
+    FROM ${bottles}
+    INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
+    WHERE ${producer}
+      AND ${activeBottleWhere()}
+    ORDER BY ${sql.join(order, sql`, `)}
+    LIMIT ${PRODUCER_CANDIDATE_LIMIT}
+  `);
+
+  return rows.map((row) => buildBottleCandidate(row, "producer"));
+}
+
 async function getOrdinaryBottleCandidateById(
   bottleId: number,
   database: AnyDatabase = db,
@@ -1363,6 +1431,7 @@ async function searchBottleCandidatesWithEmbedding(
     textCandidates,
     brandCandidates,
     brandCoverageCandidates,
+    producerCandidates,
     exactCandidate,
   ] = await Promise.all([
     input.currentBottleId
@@ -1406,6 +1475,12 @@ async function searchBottleCandidatesWithEmbedding(
         await getBrandCoverageCandidates(queryText, extractedLabel, runQuery),
     ),
     runCandidateLookupSafely(
+      "producer",
+      searchName,
+      noCandidates,
+      async () => await getProducerCandidates(extractedLabel, runQuery),
+    ),
+    runCandidateLookupSafely(
       "exact",
       searchName,
       noExactCandidate,
@@ -1426,6 +1501,9 @@ async function searchBottleCandidatesWithEmbedding(
     mergeBottleCandidate(candidates, candidate);
   }
   for (const candidate of brandCoverageCandidates) {
+    mergeBottleCandidate(candidates, candidate);
+  }
+  for (const candidate of producerCandidates) {
     mergeBottleCandidate(candidates, candidate);
   }
   if (exactCandidate) {

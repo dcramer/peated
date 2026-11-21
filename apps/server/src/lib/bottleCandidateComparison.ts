@@ -65,7 +65,28 @@ export function compareBottleCandidate(
   return result;
 }
 
-/** Order release evidence before textual relevance; retain conflicting suggestions. */
+const PRODUCER_FIELDS = new Set(["brand", "bottler", "distillers"]);
+
+function hasDistilleryConflict(comparison: BottleCandidateComparison) {
+  return comparison.conflicts.includes("distillers") ? 1 : 0;
+}
+
+function sharesProducer(comparison: BottleCandidateComparison) {
+  return comparison.agreements.some((field) => PRODUCER_FIELDS.has(field))
+    ? 1
+    : 0;
+}
+
+/**
+ * Bottle search owns this rule, for every caller: the producer comes before
+ * release facts. A Bottle from another distillery is another Bottle, so it
+ * sorts last. Next, a Bottle that shares the distillery, Brand, or bottler
+ * leads one that shares none, because an unrelated Bottle with the same age
+ * or vintage is not a possible match. A Brand conflict alone only loses this
+ * step: members and labels often name the bottler or owner as the Brand.
+ * Release facts then order Bottles, before text relevance. Conflicting
+ * Bottles stay in the list.
+ */
 export function orderBottleCandidateComparisons(
   left: BottleCandidateComparison,
   right: BottleCandidateComparison,
@@ -74,6 +95,8 @@ export function orderBottleCandidateComparisons(
   const count = (fields: readonly string[]) =>
     fields.filter((f) => releases.has(f)).length;
   return (
+    hasDistilleryConflict(left) - hasDistilleryConflict(right) ||
+    sharesProducer(right) - sharesProducer(left) ||
     count(left.conflicts) - count(right.conflicts) ||
     count(right.agreements) - count(left.agreements) ||
     left.conflicts.length - right.conflicts.length ||

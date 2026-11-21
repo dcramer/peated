@@ -1,7 +1,11 @@
-import { compareBottleCandidate } from "./bottleCandidateComparison";
+import {
+  compareBottleCandidate,
+  orderBottleCandidateComparisons,
+} from "./bottleCandidateComparison";
 import {
   rankBottleCreateCandidates,
   type BottleCreateCandidate,
+  type BottleCreateCandidateInput,
 } from "./bottleCreateCandidates";
 
 const brand = { id: 1, name: "Independent Bottler" };
@@ -85,5 +89,112 @@ describe("Bottle candidate evidence", () => {
       3,
     );
     expect(results.map((b) => b.id)).toEqual([4, 3, 2]);
+  });
+});
+
+describe("Bottle candidate order", () => {
+  const rosebank = { id: 10, name: "Rosebank" };
+  const ardbeg = { id: 11, name: "Ardbeg" };
+  const yamazaki = { id: 12, name: "Yamazaki" };
+
+  function order(
+    input: BottleCreateCandidateInput,
+    candidates: BottleCreateCandidate[],
+  ) {
+    return candidates
+      .map((bottle) => ({
+        id: bottle.id,
+        comparison: compareBottleCandidate(input, bottle),
+      }))
+      .sort((left, right) =>
+        orderBottleCandidateComparisons(left.comparison, right.comparison),
+      )
+      .map(({ id }) => id);
+  }
+
+  // A label photo read as Whyte & Whyte, Rosebank, 18 years, 1974 once listed
+  // an Ardbeg and four blends with the same age before any Rosebank.
+  test("puts the label's distillery before other producers with the same age and vintage", () => {
+    const label: BottleCreateCandidateInput = {
+      name: "",
+      brand: { name: "Whyte & Whyte" },
+      distillers: [{ name: "Rosebank" }],
+      category: "single_malt",
+      statedAge: 18,
+      vintageYear: 1974,
+    };
+    const otherDistillery: BottleCreateCandidate = {
+      id: 1,
+      name: "Ardbeg 1974 18-year-old",
+      fullName: "Cadenhead's Ardbeg 1974 18-year-old",
+      brand: { id: 20, name: "Cadenhead's" },
+      distillers: [ardbeg],
+      category: "single_malt",
+      statedAge: 18,
+      vintageYear: 1974,
+    };
+    const unrelatedBlend: BottleCreateCandidate = {
+      id: 2,
+      name: "18-year-old",
+      fullName: "Deerstalker 18-year-old",
+      brand: { id: 21, name: "Deerstalker" },
+      distillers: [],
+      statedAge: 18,
+    };
+    const otherRelease: BottleCreateCandidate = {
+      id: 3,
+      name: "21-year-old",
+      fullName: "Rosebank 21-year-old",
+      brand: rosebank,
+      distillers: [rosebank],
+      category: "single_malt",
+      statedAge: 21,
+      vintageYear: 1991,
+    };
+    const sameRelease: BottleCreateCandidate = {
+      id: 4,
+      name: "Rosebank 1974",
+      fullName: "Old Malt Cask Rosebank 1974",
+      brand: { id: 22, name: "Old Malt Cask" },
+      distillers: [rosebank],
+      statedAge: 18,
+      vintageYear: 1974,
+    };
+
+    expect(
+      order(label, [
+        otherDistillery,
+        unrelatedBlend,
+        otherRelease,
+        sameRelease,
+      ]),
+    ).toEqual([4, 3, 2, 1]);
+  });
+
+  test("a wrong Brand does not hide a Bottle from the entered distillery", () => {
+    const input: BottleCreateCandidateInput = {
+      name: "12-year-old",
+      brand: { id: 30, name: "Suntory" },
+      distillers: [yamazaki],
+      statedAge: 12,
+    };
+    const yamazakiRelease: BottleCreateCandidate = {
+      id: 5,
+      name: "18-year-old",
+      fullName: "Yamazaki 18-year-old",
+      brand: yamazaki,
+      distillers: [yamazaki],
+      statedAge: 18,
+    };
+    const unrelatedBlend: BottleCreateCandidate = {
+      id: 6,
+      name: "12-year-old",
+      fullName: "Hibiki 12-year-old",
+      brand: { id: 31, name: "Hibiki" },
+      distillers: [],
+      statedAge: 12,
+    };
+
+    expect(order(input, [unrelatedBlend, yamazakiRelease])).toEqual([5, 6]);
   });
 });

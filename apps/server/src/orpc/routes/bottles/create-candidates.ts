@@ -16,6 +16,10 @@ import {
   rankBottleCreateCandidates,
 } from "@peated/server/lib/bottleCreateCandidates";
 import {
+  bottleProducerOrder,
+  bottleProducerWhere,
+} from "@peated/server/lib/bottleProducerCandidates";
+import {
   bottleTextPredicate,
   bottleTextScore,
   textSearchQuery,
@@ -134,31 +138,11 @@ export default procedure
 
     const tinQuery = textSearchQuery(input.name, { any: true });
     const active = activeBottleWhere();
-    const distillerIds = input.distillers.flatMap(({ id }) => (id ? [id] : []));
-    const identityQueries = [
-      ...(input.brand?.id
-        ? [
-            sql`SELECT ${bottles.id} FROM ${bottles}
-        WHERE ${eq(bottles.brandId, input.brand.id)}`,
-          ]
-        : []),
-      ...(distillerIds.length
-        ? [
-            sql`SELECT ${bottlesToDistillers.bottleId}
-        FROM ${bottlesToDistillers}
-        WHERE ${inArray(bottlesToDistillers.distillerId, distillerIds)}`,
-          ]
-        : []),
-    ];
-    const identity = identityQueries.length
-      ? sql`${bottles.id} IN (${sql.join(identityQueries, sql` UNION `)})`
-      : undefined;
-    const factScore = sql`(
-      CASE WHEN ${bottles.caskNumber} = ${input.caskNumber ?? null} THEN 8 ELSE 0 END +
-      CASE WHEN ${bottles.statedAge} = ${input.statedAge ?? null} THEN 2 ELSE 0 END +
-      CASE WHEN ${bottles.vintageYear} = ${input.vintageYear ?? null} THEN 3 ELSE 0 END +
-      CASE WHEN ${bottles.abv} = ${input.abv ?? null} THEN 2 ELSE 0 END
-    )`;
+    const identity = bottleProducerWhere({
+      brandIds: input.brand?.id ? [input.brand.id] : [],
+      bottlerIds: input.bottler?.id ? [input.bottler.id] : [],
+      distillerIds: input.distillers.flatMap(({ id }) => (id ? [id] : [])),
+    });
     // Candidate discovery owns recall: reserve candidates for known producer
     // relationships before the global text limit can crowd out a rare release.
     // Keep text discovery independent because draft relationships can be wrong.
@@ -169,7 +153,7 @@ export default procedure
             .select(candidateColumns)
             .from(bottles)
             .where(and(active, identity))
-            .orderBy(desc(factScore), desc(bottles.totalTastings), bottles.id)
+            .orderBy(...bottleProducerOrder(input))
             .limit(50)
         : Promise.resolve([]),
       db
