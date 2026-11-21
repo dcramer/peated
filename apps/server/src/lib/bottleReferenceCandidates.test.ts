@@ -299,8 +299,9 @@ test("keeps a same-Brand release with a matching name when a stored fact conflic
     limit: 15,
   });
 
+  // The shared producer leads Bottles from another Brand, even with a conflict.
   expect(results).toHaveLength(15);
-  expect(results.at(-1)).toMatchObject({
+  expect(results[0]).toMatchObject({
     bottleId: release.id,
     source: expect.arrayContaining(["brand"]),
     comparison: expect.objectContaining({
